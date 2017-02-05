@@ -1,0 +1,4 @@
+PrettyStack
+===========
+
+Pretty stack traces.

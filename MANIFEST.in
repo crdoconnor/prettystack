@@ -1,0 +1,2 @@
+recursive-include prettystack *.py *.jinja2
+include VERSION

@@ -1,0 +1,10 @@
+setup.cfg
+*.kate-swp
+*.pyc
+setup.cfg
+build/
+dist/
+venv/
+state/
+tests/
+prettystack.egg-info/

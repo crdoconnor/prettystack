@@ -1,0 +1,13 @@
+{% for traceback in stacktrace.tracebacks %}
+[{{ traceback.id }}]: function '{{ Style.BRIGHT }}{{ traceback.function }}{{ Style.RESET_ALL }}'
+  {{ traceback.filename }}
+
+    {% if traceback.location.lines %}
+    {% for line in traceback.location.lines -%}
+{% if line.focus %}--> {{ Style.BRIGHT }}{{ line.no }}{{ Style.RESET_ALL }} : {{ line.code }}{% else %}    {{ line.no }} : {{ line.code }}{% endif %}
+    {% endfor %}
+    {% endif %}
+{% endfor %}
+{{ Fore.RED }}{{ Style.BRIGHT }}{{ stacktrace.exception_type }}{{ Style.RESET_ALL }}
+  {{ Style.DIM }}{{ Fore.RED }}{{ stacktrace.docstring }}{{ Style.RESET_ALL }}
+{{ Fore.RED }}{{ stacktrace.exception }}{{ Fore.RESET }}
