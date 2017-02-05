@@ -2,19 +2,26 @@ from jinja2.environment import Environment
 from jinja2 import FileSystemLoader
 from path import Path
 import colorama
-import json
+import copy
 import sys
-import os
 
 
-TEMPLATE_DIR = os.path.join(os.path.dirname(os.path.realpath(__file__)))
+TEMPLATE_FOLDER = Path(__file__).abspath().dirname()
 
 
-class PrettyStacktrace(object):
-    """Representation of a python stacktrace."""
-
+class PrettyStackTemplate(object):
+    """
+    Template for generating pretty stacktraces on command.
+    """
     def __init__(self):
-        """Create this object with exception."""
+        self._template = TEMPLATE_FOLDER.joinpath("console.jinja2")
+
+    def to_console(self):
+        new_template = copy.copy(self)
+        new_template._template = TEMPLATE_FOLDER.joinpath("console.jinja2")
+        return new_template
+
+    def current_stacktrace(self):
         tb_id = 0
         self.exception = sys.exc_info()[1]
         tb = sys.exc_info()[2]
@@ -28,35 +35,22 @@ class PrettyStacktrace(object):
             tb_id = tb_id + 1
             tb = tb.tb_next
 
-    def to_template(self, template):
         env = Environment()
-        env.loader = FileSystemLoader(TEMPLATE_DIR)
-        tmpl = env.get_template(os.path.basename(template))
+        env.loader = FileSystemLoader(str(self._template.dirname()))
+        tmpl = env.get_template(str(self._template.basename()))
         return tmpl.render(
-            stacktrace=self.to_dict(),
+            stacktrace={
+                'tracebacks': [traceback.to_dict() for traceback in self.tracebacks],
+                'exception': str(self.exception),
+                'exception_type': "{}.{}".format(
+                    type(self.exception).__module__, type(self.exception).__name__
+                ),
+                'docstring': str(self.exception.__doc__) if self.exception.__doc__ is not None else None
+            },
             Fore=colorama.Fore,
             Back=colorama.Back,
             Style=colorama.Style,
         )
-
-    def to_console(self):
-        return self.to_template("console.jinja2")
-
-    def to_dict(self):
-        return {
-            'tracebacks': [traceback.to_dict() for traceback in self.tracebacks],
-            'exception': str(self.exception),
-            'exception_type': "{}.{}".format(
-                type(self.exception).__module__, type(self.exception).__name__
-            ),
-            'docstring': str(self.exception.__doc__) if self.exception.__doc__ is not None else None
-        }
-
-    def __len__(self):
-        return len(self.tracebacks)
-
-    def __getitem__(self, index):
-        return self.tracebacks[index]
 
 
 

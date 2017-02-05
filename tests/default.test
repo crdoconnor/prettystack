@@ -15,13 +15,15 @@
             pass
   scenario:
     - Run command: |
-        from prettystack import PrettyStacktrace
+        from prettystack import PrettyStackTemplate
         from example1 import exception_raiser
+
+        prettystack_template = PrettyStackTemplate().to_console()
 
         try:
             exception_raiser()
         except Exception as exception:
-            output(PrettyStacktrace().to_console())
+            output(prettystack_template.current_stacktrace())
     - Output will be:
         reference: example exception
         changeable:

@@ -5,12 +5,14 @@ Pretty stack traces:
 
 .. code-block:: python
 
-        from prettystack import PrettyStacktrace
+        from prettystack import PrettyStackTemplate
+
+        prettystack_template = PrettyStackTemplate().to_console()
 
         try:
             exception_raiser()
         except Exception as exception:
-            output(PrettyStacktrace().to_console())
+            output(prettystack_template.current_stacktrace())
 
 Output (colorized on a terminal window)::
 
