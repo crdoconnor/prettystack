@@ -1,0 +1,11 @@
+
+STACKTRACES
+-----------
+
+Run tests with three different kinds of stacktrace -- none, one line, yourcode, virtualenv, all
+
+* Absolute / relative paths
+* HTML / colorama / plain
+* Docstring of exception
+
+Stacktrace(exception).color().without_docstring().exception_only().one_line().your_code().virtualenv().all().in_html()

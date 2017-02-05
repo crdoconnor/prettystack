@@ -6,5 +6,5 @@ build/
 dist/
 venv/
 state/
-tests/
+tests/.hitch
 prettystack.egg-info/

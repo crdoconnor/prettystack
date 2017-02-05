@@ -1,0 +1,29 @@
+- name: Default
+  preconditions:
+    files:
+      example1.py: |
+        class CatchThis(Exception):
+            """
+            Some kind of docstring
+            """
+            pass
+
+        def exception_raiser():
+            raise CatchThis("Some kind of message")
+
+        def something_else():
+            pass
+  scenario:
+    - Run command: |
+        from prettystack import PrettyStacktrace
+        from example1 import exception_raiser
+
+        try:
+            exception_raiser()
+        except Exception as exception:
+            output(PrettyStacktrace().to_console())
+    - Output will be:
+        reference: example exception
+        changeable:
+          - <ipython-input-((( anything )))>
+          - /((( anything )))/example1.py
