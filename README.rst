@@ -12,7 +12,7 @@ Pretty stack traces:
         except Exception as exception:
             output(PrettyStacktrace().to_console())
 
-Output::
+Output (colorized on a terminal window)::
 
   <ipython-input-4-2d951494fd2a>
 
