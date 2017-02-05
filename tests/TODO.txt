@@ -2,10 +2,17 @@
 STACKTRACES
 -----------
 
-Run tests with three different kinds of stacktrace -- none, one line, yourcode, virtualenv, all
+NO_CODE
+FIRST_LINE
+YOUR_CODE
+TO_VIRTUALENV
+ALL_CODE
+
+stack_template = StackTemplate().level(prettystack.YOUR_CODE).to_console()
+stack_template = StackTemplate()
+
+template.current_stacktrace()
 
 * Absolute / relative paths
-* HTML / colorama / plain
-* Docstring of exception
-
-Stacktrace(exception).color().without_docstring().exception_only().one_line().your_code().virtualenv().all().in_html()
+* HTML / colored/noncolored / plain
+* With/without docstring
