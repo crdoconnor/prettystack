@@ -165,8 +165,6 @@ class ExecutionEngine(hitchtest.ExecutionEngine):
             if hasattr(self, 'services'):
                 self.services.log(message=self.stacktrace.to_template())
                 self.shell()
-            #else:
-                #print(self.stacktrace.to_template()
 
     def on_success(self):
         """Ka-ching!"""

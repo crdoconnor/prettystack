@@ -17,6 +17,7 @@ class PrettyStackTemplate(object):
     def __init__(self):
         self._template = TEMPLATE_FOLDER.joinpath("console.jinja2")
         self._stop_before_filename = None
+        self._only_after_filename = None
 
     def to_console(self):
         """
@@ -26,7 +27,7 @@ class PrettyStackTemplate(object):
         new_template._template = TEMPLATE_FOLDER.joinpath("console.jinja2")
         return new_template
 
-    def stop_before(self, filename=None):
+    def stop_before_file(self, filename):
         """
         Display all stacktrace lines until the exception hits this filename.
 
@@ -38,33 +39,60 @@ class PrettyStackTemplate(object):
         new_template._stop_before_filename = Path(filename).abspath()
         return new_template
 
+    def only_after_file(self, filename):
+        """
+        Display all stacktrace lines after this filename.
+
+        Will not show any part of the stacktrace in this filename above it.
+        """
+        if not Path(filename).exists():
+            raise exceptions.StackTraceFilenameNotFound(filename)
+        new_template = copy(self)
+        new_template._only_after_filename = Path(filename).abspath()
+        return new_template
+
     def current_stacktrace(self):
         tb_id = 0
         self.exception = sys.exc_info()[1]
         tb = sys.exc_info()[2]
         # Create list of tracebacks
-        self.tracebacks = []
-        keep_getting_tracebacks = True
-        while tb is not None and keep_getting_tracebacks:
+        tracebacks = []
+        while tb is not None:
             filename = tb.tb_frame.f_code.co_filename
             if filename == '<frozen importlib._bootstrap>':
                 break
 
-            if Path(filename).exists():
-                if self._stop_before_filename is not None:
-                    if Path(filename).abspath() == self._stop_before_filename:
-                        break
-
-            self.tracebacks.append(PrettyTraceback(tb_id, tb))
+            tracebacks.append(PrettyTraceback(tb_id, tb))
             tb_id = tb_id + 1
             tb = tb.tb_next
 
+        # Cut out lower level tracebacks that we were instructed to ignore
+        if self._stop_before_filename is not None:
+            updated_tracebacks = []
+            for traceback in tracebacks:
+                if self._stop_before_filename == traceback.abspath:
+                    break
+                updated_tracebacks.append(traceback)
+            tracebacks = updated_tracebacks
+
+        # Cut out higher level tracebacks that we were instructed to ignore
+        if self._only_after_filename is not None:
+            updated_tracebacks = []
+            start_appending = False
+            for traceback in reversed(tracebacks):
+                if start_appending:
+                    updated_tracebacks.append(traceback)
+                if self._only_after_filename == traceback.abspath:
+                    start_appending = True
+            tracebacks = list(reversed(updated_tracebacks))
+
+        # Render list of tracebacks to template
         env = Environment()
         env.loader = FileSystemLoader(str(self._template.dirname()))
         tmpl = env.get_template(str(self._template.basename()))
         return tmpl.render(
             stacktrace={
-                'tracebacks': [traceback.to_dict() for traceback in self.tracebacks],
+                'tracebacks': [traceback.to_dict() for traceback in tracebacks],
                 'exception': str(self.exception),
                 'exception_type': "{}.{}".format(
                     type(self.exception).__module__, type(self.exception).__name__
@@ -110,6 +138,7 @@ class Location(object):
                 _lines.append(LOC(self._contents[i], i, i == self._line_no - 1))
         return _lines
 
+
 class PrettyTraceback(object):
     """Representation of a python traceback."""
 
@@ -124,39 +153,49 @@ class PrettyTraceback(object):
     def to_dict(self):
         return {
             'id': self.tb_id,
-            'filename': self.filename(),
-            'lineno': self.lineno(),
-            'function': self.func(),
+            'filename': self.filename,
+            'lineno': self.lineno,
+            'function': self.func,
             'line': self._location.line_no,
-            'location': self.location(),
+            'location': self.location,
         }
 
+    @property
     def location(self):
         return self._location
 
+    @property
     def filename(self):
         return self.traceback.tb_frame.f_code.co_filename
 
+    @property
+    def abspath(self):
+        return Path(self.filename).abspath()
+
+    @property
     def lineno(self):
         return self.traceback.tb_lineno
 
+    @property
     def func(self):
         return self.traceback.tb_frame.f_code.co_name
 
+    @property
     def localvars(self):
         return self.traceback.tb_frame.f_locals
 
+    @property
     def globalvars(self):
         return self.traceback.tb_frame.f_globals
 
+    @property
     def frame(self):
         return self.traceback.tb_frame
 
     def __repr__(self):
-        return "[{}] File {}, line {} in {}: {}".format(
+        return "[{}] File {}, line {} in {}.".format(
             self.tb_id,
-            self.filename(),
-            self.lineno(),
-            self.func(),
-            self._loc.line_no,
+            self.filename,
+            self.lineno,
+            self.func,
         )

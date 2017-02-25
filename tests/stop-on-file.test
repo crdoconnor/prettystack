@@ -1,4 +1,8 @@
-- name: Stop before filename
+- name: Stop on file
+  description: |
+    You can intentionally ignore lines in the traceback which
+    occur up or down the stack.
+    
   preconditions:
     files:
       example1.py: |
@@ -28,14 +32,31 @@
         from prettystack import PrettyStackTemplate
         from example3 import yet_another_exception_raiser
 
-        prettystack_template = PrettyStackTemplate().stop_before(filename="example2.py").to_console()
+        prettystack_template = PrettyStackTemplate().stop_before_file("example2.py").to_console()
 
         try:
             yet_another_exception_raiser()
         except Exception as exception:
             output(prettystack_template.current_stacktrace())
     - Output will be:
-        reference: example limited three story traceback
+        reference: example stacktrace skipping first two lines
         changeable:
           - <ipython-input-((( anything )))>
+          - /((( anything )))/example3.py
+
+    - Run command: |
+        from prettystack import PrettyStackTemplate
+        from example3 import yet_another_exception_raiser
+
+        prettystack_template = PrettyStackTemplate().only_after_file("example1.py").to_console()
+
+        try:
+            yet_another_exception_raiser()
+        except Exception as exception:
+            output(prettystack_template.current_stacktrace())
+    - Output will be:
+        reference: example stacktrace skipping last line
+        changeable:
+          - <ipython-input-((( anything )))>
+          - /((( anything )))/example2.py
           - /((( anything )))/example3.py
