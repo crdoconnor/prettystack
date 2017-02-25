@@ -1,8 +1,9 @@
 from jinja2.environment import Environment
+from prettystack import exceptions
 from jinja2 import FileSystemLoader
 from path import Path
 import colorama
-import copy
+from copy import copy
 import sys
 
 
@@ -15,10 +16,26 @@ class PrettyStackTemplate(object):
     """
     def __init__(self):
         self._template = TEMPLATE_FOLDER.joinpath("console.jinja2")
+        self._stop_before_filename = None
 
     def to_console(self):
-        new_template = copy.copy(self)
+        """
+        Returns a template that will render stacktraces to the console, in color.
+        """
+        new_template = copy(self)
         new_template._template = TEMPLATE_FOLDER.joinpath("console.jinja2")
+        return new_template
+
+    def stop_before(self, filename=None):
+        """
+        Display all stacktrace lines until the exception hits this filename.
+
+        Will not show any part of the stacktrace in this filename or beneath it.
+        """
+        if not Path(filename).exists():
+            raise exceptions.StackTraceFilenameNotFound(filename)
+        new_template = copy(self)
+        new_template._stop_before_filename = Path(filename).abspath()
         return new_template
 
     def current_stacktrace(self):
@@ -27,10 +44,17 @@ class PrettyStackTemplate(object):
         tb = sys.exc_info()[2]
         # Create list of tracebacks
         self.tracebacks = []
-        while tb is not None:
+        keep_getting_tracebacks = True
+        while tb is not None and keep_getting_tracebacks:
             filename = tb.tb_frame.f_code.co_filename
             if filename == '<frozen importlib._bootstrap>':
                 break
+
+            if Path(filename).exists():
+                if self._stop_before_filename is not None:
+                    if Path(filename).abspath() == self._stop_before_filename:
+                        break
+
             self.tracebacks.append(PrettyTraceback(tb_id, tb))
             tb_id = tb_id + 1
             tb = tb.tb_next

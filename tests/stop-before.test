@@ -1,0 +1,41 @@
+- name: Stop before filename
+  preconditions:
+    files:
+      example1.py: |
+        class CatchThis(Exception):
+            """
+            Some kind of docstring
+            """
+            pass
+
+        def exception_raiser():
+            raise CatchThis("Some kind of message")
+
+        def something_else():
+            pass
+      example2.py: |
+        from example1 import exception_raiser
+
+        def another_exception_raiser():
+            exception_raiser()
+      example3.py: |
+        from example2 import another_exception_raiser
+
+        def yet_another_exception_raiser():
+            another_exception_raiser()
+  scenario:
+    - Run command: |
+        from prettystack import PrettyStackTemplate
+        from example3 import yet_another_exception_raiser
+
+        prettystack_template = PrettyStackTemplate().stop_before(filename="example2.py").to_console()
+
+        try:
+            yet_another_exception_raiser()
+        except Exception as exception:
+            output(prettystack_template.current_stacktrace())
+    - Output will be:
+        reference: example limited three story traceback
+        changeable:
+          - <ipython-input-((( anything )))>
+          - /((( anything )))/example3.py
