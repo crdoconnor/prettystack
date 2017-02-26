@@ -1,0 +1,27 @@
+[2]: function '[1manother_exception_raiser[0m'
+  /((( anything )))/example2.py
+
+    
+        1 : 
+        2 : def another_exception_raiser():
+    --> [1m3[0m :     exception_raiser()
+        4 : 
+    
+    
+
+[3]: function '[1mexception_raiser[0m'
+  /((( anything )))/example1.py
+
+    
+        5 : 
+        6 : def exception_raiser():
+    --> [1m7[0m :     raise CatchThis("Some kind of message")
+        8 : 
+    
+    
+
+[31m[1mexample1.CatchThis[0m
+  [2m[31m
+    Some kind of docstring
+    [0m
+[31mSome kind of message[39m

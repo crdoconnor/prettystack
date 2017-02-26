@@ -19,6 +19,8 @@ class PrettyStackTemplate(object):
         self._template = TEMPLATE_FOLDER.joinpath("console.jinja2")
         self._cut_top_off_including = None
         self._cut_top_off_after = None
+        self._cut_bottom_off_including = None
+        self._cut_bottom_off_until = None
 
     def to_console(self):
         """
@@ -50,6 +52,20 @@ class PrettyStackTemplate(object):
             raise exceptions.StackTraceFilenameNotFound(filename)
         new_template = copy(self)
         new_template._cut_top_off_after = Path(filename).abspath()
+        return new_template
+
+    def cut_bottom_off_including(self, filename):
+        if not Path(filename).exists():
+            raise exceptions.StackTraceFilenameNotFound(filename)
+        new_template = copy(self)
+        new_template._cut_bottom_off_including = Path(filename).abspath()
+        return new_template
+
+    def cut_bottom_off_until(self, filename):
+        if not Path(filename).exists():
+            raise exceptions.StackTraceFilenameNotFound(filename)
+        new_template = copy(self)
+        new_template._cut_bottom_off_until = Path(filename).abspath()
         return new_template
 
     def current_stacktrace(self):
@@ -86,6 +102,26 @@ class PrettyStackTemplate(object):
                 if self._cut_top_off_after == traceback.abspath:
                     start_appending = True
             tracebacks = list(reversed(updated_tracebacks))
+
+        if self._cut_bottom_off_including is not None:
+            updated_tracebacks = []
+            start_appending = False
+            for traceback in tracebacks:
+                if start_appending:
+                    updated_tracebacks.append(traceback)
+                if self._cut_bottom_off_including == traceback.abspath:
+                    start_appending = True
+            tracebacks = updated_tracebacks
+
+        if self._cut_bottom_off_until is not None:
+            updated_tracebacks = []
+            start_appending = False
+            for traceback in tracebacks:
+                if self._cut_bottom_off_until == traceback.abspath:
+                    start_appending = True
+                if start_appending:
+                    updated_tracebacks.append(traceback)
+            tracebacks = updated_tracebacks
 
         # Render list of tracebacks to template
         env = Environment()
