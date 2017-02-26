@@ -28,49 +28,49 @@
         def yet_another_exception_raiser():
             another_exception_raiser()
   scenario:
-    #- Run command: |
-        #from prettystack import PrettyStackTemplate
-        #from example3 import yet_another_exception_raiser
+    - Run command: |
+        from prettystack import PrettyStackTemplate
+        from example3 import yet_another_exception_raiser
 
-        #prettystack_template = PrettyStackTemplate().cut_top_off_including("example2.py").to_console()
+        prettystack_template1 = PrettyStackTemplate().cut_top_off_including("example2.py").to_console()
 
-        #try:
-            #yet_another_exception_raiser()
-        #except Exception as exception:
-            #output(prettystack_template.current_stacktrace())
-    #- Output will be:
-        #reference: skip top lines
-        #changeable:
-          #- <ipython-input-((( anything )))>
-          #- /((( anything )))/example3.py
-
-    #- Run command: |
-        #from prettystack import PrettyStackTemplate
-        #from example3 import yet_another_exception_raiser
-
-        #prettystack_template = PrettyStackTemplate().cut_top_off_after("example1.py").to_console()
-
-        #try:
-            #yet_another_exception_raiser()
-        #except Exception as exception:
-            #output(prettystack_template.current_stacktrace())
-    #- Output will be:
-        #reference: skip bottom line
-        #changeable:
-          #- <ipython-input-((( anything )))>
-          #- /((( anything )))/example2.py
-          #- /((( anything )))/example3.py
+        try:
+            yet_another_exception_raiser()
+        except Exception as exception:
+            output(prettystack_template1.current_stacktrace())
+    - Output will be:
+        reference: skip top lines
+        changeable:
+          - <ipython-input-((( anything )))>
+          - /((( anything )))/example3.py
 
     - Run command: |
         from prettystack import PrettyStackTemplate
         from example3 import yet_another_exception_raiser
 
-        prettystack_template = PrettyStackTemplate().cut_bottom_off_including("example3.py").to_console()
+        prettystack_template2 = PrettyStackTemplate().cut_top_off_after("example1.py").to_console()
 
         try:
             yet_another_exception_raiser()
         except Exception as exception:
-            output(prettystack_template.current_stacktrace())
+            output(prettystack_template2.current_stacktrace())
+    - Output will be:
+        reference: skip bottom line
+        changeable:
+          - <ipython-input-((( anything )))>
+          - /((( anything )))/example2.py
+          - /((( anything )))/example3.py
+
+    - Run command: |
+        from prettystack import PrettyStackTemplate
+        from example3 import yet_another_exception_raiser
+
+        prettystack_template3 = PrettyStackTemplate().cut_bottom_off_including("example3.py").to_console()
+
+        try:
+            yet_another_exception_raiser()
+        except Exception as exception:
+            output(prettystack_template3.current_stacktrace())
     - Output will be:
         reference: cut bottom off including
         changeable:
@@ -81,12 +81,12 @@
         from prettystack import PrettyStackTemplate
         from example3 import yet_another_exception_raiser
 
-        prettystack_template = PrettyStackTemplate().cut_bottom_off_until("example3.py").to_console()
+        prettystack_template4 = PrettyStackTemplate().cut_bottom_off_until("example3.py").to_console()
 
         try:
             yet_another_exception_raiser()
         except Exception as exception:
-            output(prettystack_template.current_stacktrace())
+            output(prettystack_template4.current_stacktrace())
     - Output will be:
         reference: cut bottom off until
         changeable:
