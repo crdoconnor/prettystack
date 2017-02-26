@@ -17,8 +17,8 @@ class PrettyStackTemplate(object):
     """
     def __init__(self):
         self._template = TEMPLATE_FOLDER.joinpath("console.jinja2")
-        self._stop_before_filename = None
-        self._only_after_filename = None
+        self._cut_top_off_including = None
+        self._cut_top_off_after = None
 
     def to_console(self):
         """
@@ -28,7 +28,7 @@ class PrettyStackTemplate(object):
         new_template._template = TEMPLATE_FOLDER.joinpath("console.jinja2")
         return new_template
 
-    def stop_before_file(self, filename):
+    def cut_top_off_including(self, filename):
         """
         Display all stacktrace lines until the exception hits this filename.
 
@@ -37,10 +37,10 @@ class PrettyStackTemplate(object):
         if not Path(filename).exists():
             raise exceptions.StackTraceFilenameNotFound(filename)
         new_template = copy(self)
-        new_template._stop_before_filename = Path(filename).abspath()
+        new_template._cut_top_off_including = Path(filename).abspath()
         return new_template
 
-    def only_after_file(self, filename):
+    def cut_top_off_after(self, filename):
         """
         Display all stacktrace lines after this filename.
 
@@ -49,7 +49,7 @@ class PrettyStackTemplate(object):
         if not Path(filename).exists():
             raise exceptions.StackTraceFilenameNotFound(filename)
         new_template = copy(self)
-        new_template._only_after_filename = Path(filename).abspath()
+        new_template._cut_top_off_after = Path(filename).abspath()
         return new_template
 
     def current_stacktrace(self):
@@ -68,22 +68,22 @@ class PrettyStackTemplate(object):
             tb = tb.tb_next
 
         # Cut out lower level tracebacks that we were instructed to ignore
-        if self._stop_before_filename is not None:
+        if self._cut_top_off_including is not None:
             updated_tracebacks = []
             for traceback in tracebacks:
-                if self._stop_before_filename == traceback.abspath:
+                if self._cut_top_off_including == traceback.abspath:
                     break
                 updated_tracebacks.append(traceback)
             tracebacks = updated_tracebacks
 
         # Cut out higher level tracebacks that we were instructed to ignore
-        if self._only_after_filename is not None:
+        if self._cut_top_off_after is not None:
             updated_tracebacks = []
             start_appending = False
             for traceback in reversed(tracebacks):
                 if start_appending:
                     updated_tracebacks.append(traceback)
-                if self._only_after_filename == traceback.abspath:
+                if self._cut_top_off_after == traceback.abspath:
                     start_appending = True
             tracebacks = list(reversed(updated_tracebacks))
 
