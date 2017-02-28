@@ -17,10 +17,10 @@ class PrettyStackTemplate(object):
     """
     def __init__(self):
         self._template = TEMPLATE_FOLDER.joinpath("console.jinja2")
-        self._cut_top_off_including = None
-        self._cut_top_off_after = None
-        self._cut_bottom_off_including = None
-        self._cut_bottom_off_until = None
+        self._cut_calling_code = None
+        #self._cut_top_off_after = None
+        #self._cut_bottom_off_including = None
+        #self._cut_bottom_off_until = None
 
     def to_console(self):
         """
@@ -30,7 +30,7 @@ class PrettyStackTemplate(object):
         new_template._template = TEMPLATE_FOLDER.joinpath("console.jinja2")
         return new_template
 
-    def cut_top_off_including(self, filename):
+    def cut_calling_code(self, filename):
         """
         Display all stacktrace lines until the exception hits this filename.
 
@@ -39,34 +39,34 @@ class PrettyStackTemplate(object):
         if not Path(filename).exists():
             raise exceptions.StackTraceFilenameNotFound(filename)
         new_template = copy(self)
-        new_template._cut_top_off_including = Path(filename).abspath()
+        new_template._cut_calling_code = Path(filename).abspath()
         return new_template
 
-    def cut_top_off_after(self, filename):
-        """
-        Display all stacktrace lines after this filename.
+    #def cut_top_off_after(self, filename):
+        #"""
+        #Display all stacktrace lines after this filename.
 
-        Will not show any part of the stacktrace in this filename above it.
-        """
-        if not Path(filename).exists():
-            raise exceptions.StackTraceFilenameNotFound(filename)
-        new_template = copy(self)
-        new_template._cut_top_off_after = Path(filename).abspath()
-        return new_template
+        #Will not show any part of the stacktrace in this filename above it.
+        #"""
+        #if not Path(filename).exists():
+            #raise exceptions.StackTraceFilenameNotFound(filename)
+        #new_template = copy(self)
+        #new_template._cut_top_off_after = Path(filename).abspath()
+        #return new_template
 
-    def cut_bottom_off_including(self, filename):
-        if not Path(filename).exists():
-            raise exceptions.StackTraceFilenameNotFound(filename)
-        new_template = copy(self)
-        new_template._cut_bottom_off_including = Path(filename).abspath()
-        return new_template
+    #def cut_bottom_off_including(self, filename):
+        #if not Path(filename).exists():
+            #raise exceptions.StackTraceFilenameNotFound(filename)
+        #new_template = copy(self)
+        #new_template._cut_bottom_off_including = Path(filename).abspath()
+        #return new_template
 
-    def cut_bottom_off_until(self, filename):
-        if not Path(filename).exists():
-            raise exceptions.StackTraceFilenameNotFound(filename)
-        new_template = copy(self)
-        new_template._cut_bottom_off_until = Path(filename).abspath()
-        return new_template
+    #def cut_bottom_off_until(self, filename):
+        #if not Path(filename).exists():
+            #raise exceptions.StackTraceFilenameNotFound(filename)
+        #new_template = copy(self)
+        #new_template._cut_bottom_off_until = Path(filename).abspath()
+        #return new_template
 
     def current_stacktrace(self):
         tb_id = 0
@@ -83,45 +83,48 @@ class PrettyStackTemplate(object):
             tb_id = tb_id + 1
             tb = tb.tb_next
 
-        # Cut out lower level tracebacks that we were instructed to ignore
-        if self._cut_top_off_including is not None:
+        ## Cut out lower level tracebacks that we were instructed to ignore
+        if self._cut_calling_code is not None:
             updated_tracebacks = []
+            start_including = False
             for traceback in tracebacks:
-                if self._cut_top_off_including == traceback.abspath:
-                    break
-                updated_tracebacks.append(traceback)
+                if start_including:
+                    updated_tracebacks.append(traceback)
+
+                if traceback.abspath == self._cut_calling_code:
+                    start_including = True
             tracebacks = updated_tracebacks
 
-        # Cut out higher level tracebacks that we were instructed to ignore
-        if self._cut_top_off_after is not None:
-            updated_tracebacks = []
-            start_appending = False
-            for traceback in reversed(tracebacks):
-                if start_appending:
-                    updated_tracebacks.append(traceback)
-                if self._cut_top_off_after == traceback.abspath:
-                    start_appending = True
-            tracebacks = list(reversed(updated_tracebacks))
+        ## Cut out higher level tracebacks that we were instructed to ignore
+        #if self._cut_top_off_after is not None:
+            #updated_tracebacks = []
+            #start_appending = False
+            #for traceback in reversed(tracebacks):
+                #if start_appending:
+                    #updated_tracebacks.append(traceback)
+                #if self._cut_top_off_after == traceback.abspath:
+                    #start_appending = True
+            #tracebacks = list(reversed(updated_tracebacks))
 
-        if self._cut_bottom_off_including is not None:
-            updated_tracebacks = []
-            start_appending = False
-            for traceback in tracebacks:
-                if start_appending:
-                    updated_tracebacks.append(traceback)
-                if self._cut_bottom_off_including == traceback.abspath:
-                    start_appending = True
-            tracebacks = updated_tracebacks
+        #if self._cut_bottom_off_including is not None:
+            #updated_tracebacks = []
+            #start_appending = False
+            #for traceback in tracebacks:
+                #if start_appending:
+                    #updated_tracebacks.append(traceback)
+                #if self._cut_bottom_off_including == traceback.abspath:
+                    #start_appending = True
+            #tracebacks = updated_tracebacks
 
-        if self._cut_bottom_off_until is not None:
-            updated_tracebacks = []
-            start_appending = False
-            for traceback in tracebacks:
-                if self._cut_bottom_off_until == traceback.abspath:
-                    start_appending = True
-                if start_appending:
-                    updated_tracebacks.append(traceback)
-            tracebacks = updated_tracebacks
+        #if self._cut_bottom_off_until is not None:
+            #updated_tracebacks = []
+            #start_appending = False
+            #for traceback in tracebacks:
+                #if self._cut_bottom_off_until == traceback.abspath:
+                    #start_appending = True
+                #if start_appending:
+                    #updated_tracebacks.append(traceback)
+            #tracebacks = updated_tracebacks
 
         # Render list of tracebacks to template
         env = Environment()
