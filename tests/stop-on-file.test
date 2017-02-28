@@ -27,15 +27,18 @@
 
         def yet_another_exception_raiser():
             another_exception_raiser()
+
+        def yet_yet_another_exception_raiser():
+            yet_another_exception_raiser()
   scenario:
     - Run command: |
         from prettystack import PrettyStackTemplate
-        from example3 import yet_another_exception_raiser
+        from example3 import yet_yet_another_exception_raiser
 
         prettystack_template1 = PrettyStackTemplate().cut_calling_code("example3.py").to_console()
 
         try:
-            yet_another_exception_raiser()
+            yet_yet_another_exception_raiser()
         except Exception as exception:
             output(prettystack_template1.current_stacktrace())
     - Output will be:

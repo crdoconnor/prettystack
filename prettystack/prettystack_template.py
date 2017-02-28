@@ -88,7 +88,7 @@ class PrettyStackTemplate(object):
             updated_tracebacks = []
             start_including = False
             for traceback in tracebacks:
-                if start_including:
+                if start_including and traceback.abspath != self._cut_calling_code:
                     updated_tracebacks.append(traceback)
 
                 if traceback.abspath == self._cut_calling_code:

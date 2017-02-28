@@ -1,4 +1,4 @@
-[2]: function '[1manother_exception_raiser[0m'
+[3]: function '[1manother_exception_raiser[0m'
   /((( anything )))/example2.py
 
     
@@ -9,7 +9,7 @@
     
     
 
-[3]: function '[1mexception_raiser[0m'
+[4]: function '[1mexception_raiser[0m'
   /((( anything )))/example1.py
 
     
