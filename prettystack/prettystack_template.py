@@ -1,11 +1,10 @@
 from prettystack.traceback import PrettyTraceback
-from prettystack import exceptions
+from prettystack import exceptions, utils
 from jinja2.environment import Environment
 from jinja2 import FileSystemLoader
 from path import Path
 from copy import copy
 import colorama
-import sys
 
 
 TEMPLATE_FOLDER = Path(__file__).abspath().dirname()
@@ -67,23 +66,12 @@ class PrettyStackTemplate(object):
         #new_template = copy(self)
         #new_template._cut_bottom_off_until = Path(filename).abspath()
         #return new_template
-
-    def current_stacktrace(self):
-        tb_id = 0
-        self.exception = sys.exc_info()[1]
-        tb = sys.exc_info()[2]
-        # Create list of tracebacks
-        tracebacks = []
-        while tb is not None:
-            filename = tb.tb_frame.f_code.co_filename
-            if filename == '<frozen importlib._bootstrap>':
-                break
-
-            tracebacks.append(PrettyTraceback(tb_id, tb))
-            tb_id = tb_id + 1
-            tb = tb.tb_next
-
+    
+    
+    def from_stacktrace_data(self, data):
         ## Cut out lower level tracebacks that we were instructed to ignore
+        tracebacks = [PrettyTraceback(traceback) for traceback in data['tracebacks']]
+        
         if self._cut_calling_code is not None:
             updated_tracebacks = []
             start_including = False
@@ -95,37 +83,6 @@ class PrettyStackTemplate(object):
                     start_including = True
             tracebacks = updated_tracebacks
 
-        ## Cut out higher level tracebacks that we were instructed to ignore
-        #if self._cut_top_off_after is not None:
-            #updated_tracebacks = []
-            #start_appending = False
-            #for traceback in reversed(tracebacks):
-                #if start_appending:
-                    #updated_tracebacks.append(traceback)
-                #if self._cut_top_off_after == traceback.abspath:
-                    #start_appending = True
-            #tracebacks = list(reversed(updated_tracebacks))
-
-        #if self._cut_bottom_off_including is not None:
-            #updated_tracebacks = []
-            #start_appending = False
-            #for traceback in tracebacks:
-                #if start_appending:
-                    #updated_tracebacks.append(traceback)
-                #if self._cut_bottom_off_including == traceback.abspath:
-                    #start_appending = True
-            #tracebacks = updated_tracebacks
-
-        #if self._cut_bottom_off_until is not None:
-            #updated_tracebacks = []
-            #start_appending = False
-            #for traceback in tracebacks:
-                #if self._cut_bottom_off_until == traceback.abspath:
-                    #start_appending = True
-                #if start_appending:
-                    #updated_tracebacks.append(traceback)
-            #tracebacks = updated_tracebacks
-
         # Render list of tracebacks to template
         env = Environment()
         env.loader = FileSystemLoader(str(self._template.dirname()))
@@ -133,14 +90,58 @@ class PrettyStackTemplate(object):
         return tmpl.render(
             stacktrace={
                 'tracebacks': [traceback.to_dict() for traceback in tracebacks],
-                'exception': str(self.exception),
-                'exception_type': "{}.{}".format(
-                    type(self.exception).__module__, type(self.exception).__name__
-                ),
-                'docstring': str(self.exception.__doc__)
-                if self.exception.__doc__ is not None else None
+                'exception': data['exception_string'],
+                'exception_type': data['exception_type'],
+                'docstring': data['docstring'],
             },
             Fore=colorama.Fore,
             Back=colorama.Back,
             Style=colorama.Style,
         )
+
+    def current_stacktrace(self):
+        return self.from_stacktrace_data(utils.current_stack_trace_data())
+        #tb_id = 0
+        #self.exception = sys.exc_info()[1]
+        #tb = sys.exc_info()[2]
+        ## Create list of tracebacks
+        #tracebacks = []
+        #while tb is not None:
+            #filename = tb.tb_frame.f_code.co_filename
+            #if filename == '<frozen importlib._bootstrap>':
+                #break
+
+            #tracebacks.append(PrettyTraceback(tb_id, tb))
+            #tb_id = tb_id + 1
+            #tb = tb.tb_next
+
+        ### Cut out lower level tracebacks that we were instructed to ignore
+        #if self._cut_calling_code is not None:
+            #updated_tracebacks = []
+            #start_including = False
+            #for traceback in tracebacks:
+                #if start_including and traceback.abspath != self._cut_calling_code:
+                    #updated_tracebacks.append(traceback)
+
+                #if traceback.abspath == self._cut_calling_code:
+                    #start_including = True
+            #tracebacks = updated_tracebacks
+
+        ## Render list of tracebacks to template
+        #env = Environment()
+        #env.loader = FileSystemLoader(str(self._template.dirname()))
+        #tmpl = env.get_template(str(self._template.basename()))
+        #return tmpl.render(
+            #stacktrace={
+                #'tracebacks': [traceback.to_dict() for traceback in tracebacks],
+                #'exception': str(self.exception),
+                #'exception_type': "{}.{}".format(
+                    #type(self.exception).__module__, type(self.exception).__name__
+                #),
+                #'docstring': str(self.exception.__doc__)
+                #if self.exception.__doc__ is not None else None
+            #},
+            #Fore=colorama.Fore,
+            #Back=colorama.Back,
+            #Style=colorama.Style,
+        #)

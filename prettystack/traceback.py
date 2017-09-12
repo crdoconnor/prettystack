@@ -41,13 +41,21 @@ class Location(object):
 
 class PrettyTraceback(object):
     """Representation of a python traceback."""
-    def __init__(self, tb_id, traceback):
-        self.tb_id = tb_id
-        self.traceback = traceback
-        self._location = Location(
-            self.traceback.tb_frame.f_code.co_filename,
-            self.traceback.tb_lineno,
-        )
+    #def __init__(self, tb_id, traceback):
+        #self.tb_id = tb_id
+        #self.traceback = traceback
+        #self._location = Location(
+            #self.traceback.tb_frame.f_code.co_filename,
+            #self.traceback.tb_lineno,
+        #)
+    
+    def __init__(self, traceback):
+        self.tb_id = traceback['tb_id']
+        self.lineno = traceback['line']
+        self.filename = traceback['filename']
+        self.func = traceback['function']
+        self.location = Location(traceback['filename'], traceback['line'])
+        
 
     def to_dict(self):
         return {
@@ -55,41 +63,41 @@ class PrettyTraceback(object):
             'filename': self.filename,
             'lineno': self.lineno,
             'function': self.func,
-            'line': self._location.line_no,
+            'line': self.location.line_no,
             'location': self.location,
         }
 
-    @property
-    def location(self):
-        return self._location
+    #@property
+    #def location(self):
+        #return self._location
 
-    @property
-    def filename(self):
-        return self.traceback.tb_frame.f_code.co_filename
+    #@property
+    #def filename(self):
+        #return self.traceback.tb_frame.f_code.co_filename
 
     @property
     def abspath(self):
         return Path(self.filename).abspath()
 
-    @property
-    def lineno(self):
-        return self.traceback.tb_lineno
+    #@property
+    #def lineno(self):
+        #return self.line_no
 
-    @property
-    def func(self):
-        return self.traceback.tb_frame.f_code.co_name
+    #@property
+    #def func(self):
+        #return self.traceback.tb_frame.f_code.co_name
 
-    @property
-    def localvars(self):
-        return self.traceback.tb_frame.f_locals
+    #@property
+    #def localvars(self):
+        #return self.traceback.tb_frame.f_locals
 
-    @property
-    def globalvars(self):
-        return self.traceback.tb_frame.f_globals
+    #@property
+    #def globalvars(self):
+        #return self.traceback.tb_frame.f_globals
 
-    @property
-    def frame(self):
-        return self.traceback.tb_frame
+    #@property
+    #def frame(self):
+        #return self.traceback.tb_frame
 
     def __repr__(self):
         return "[{}] File {}, line {} in {}.".format(
