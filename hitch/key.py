@@ -183,17 +183,17 @@ def lint():
     """
     Lint all code.
     """
-    python("-m", "flake8")(
-        DIR.project.joinpath("strictyaml"),
-        "--max-line-length=100",
-        "--exclude=__init__.py",
-    ).run()
-    python("-m", "flake8")(
-        DIR.key.joinpath("key.py"),
-        "--max-line-length=100",
-        "--exclude=__init__.py",
-    ).run()
-    print("Lint success!")
+    #python("-m", "flake8")(
+        #DIR.project.joinpath("prettystack"),
+        #"--max-line-length=100",
+        #"--exclude=__init__.py",
+    #).run()
+    #python("-m", "flake8")(
+        #DIR.key.joinpath("key.py"),
+        #"--max-line-length=100",
+        #"--exclude=__init__.py",
+    #).run()
+    #print("Lint success!")
 
 
 def hitch(*args):
@@ -207,7 +207,7 @@ def deploy(version):
     """
     Deploy to pypi as specified version.
     """
-    NAME = "strictyaml"
+    NAME = "prettystack"
     git = Command("git").in_dir(DIR.project)
     version_file = DIR.project.joinpath("VERSION")
     old_version = version_file.bytes().decode('utf8')
