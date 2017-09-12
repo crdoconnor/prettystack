@@ -275,22 +275,3 @@ def hvenvup(package, directory):
     pip = Command(DIR.gen.joinpath("hvenv", "bin", "pip"))
     pip("uninstall", package, "-y").run()
     pip("install", DIR.project.joinpath(directory).abspath()).run()
-
-
-def rot():
-    """
-    Test for code rot by upgrading dependency and running tests (ruamel.yaml).
-    """
-    print("Checking code rot for strictyaml project...")
-    latest_version = requests.get(
-        "https://pypi.python.org/pypi/ruamel.yaml/json"
-    ).json()['info']['version']
-    base_story = load(DIR.key.joinpath("strictyaml.story").bytes().decode("utf8"))
-    latest_tested_version = str(base_story['strictyaml']['params']['ruamel version'])
-
-    if latest_version != latest_tested_version:
-        base_story['strictyaml']['params']['ruamel version'] = load(latest_version)
-        DIR.key.joinpath("strictyaml.story").write_text(base_story.as_yaml())
-        regression()
-    else:
-        print("No dependency changes")
