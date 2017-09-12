@@ -1,6 +1,12 @@
 [0]: function '[1m<module>[0m'
-  <ipython-input-((( anything )))>
+  /((( anything )))/examplepythoncode.py
 
+    
+        32 :     
+        33 :     try:
+    --> [1m34[0m :         exception_raiser()
+        35 :     except Exception as exception:
+    
     
 
 [1]: function '[1mexception_raiser[0m'

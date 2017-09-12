@@ -7,4 +7,7 @@ dist/
 venv/
 state/
 tests/.hitch
+hitch/gen
+hitch/__pycache__
+__pycache__
 prettystack.egg-info/

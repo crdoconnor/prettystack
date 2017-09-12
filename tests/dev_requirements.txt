@@ -1,4 +1,0 @@
-ipykernel
-pip
-q
-pudb
