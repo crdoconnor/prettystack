@@ -17,9 +17,6 @@ class PrettyStackTemplate(object):
     def __init__(self):
         self._template = TEMPLATE_FOLDER.joinpath("console.jinja2")
         self._cut_calling_code = None
-        #self._cut_top_off_after = None
-        #self._cut_bottom_off_including = None
-        #self._cut_bottom_off_until = None
 
     def to_console(self):
         """
@@ -41,34 +38,11 @@ class PrettyStackTemplate(object):
         new_template._cut_calling_code = Path(filename).abspath()
         return new_template
 
-    #def cut_top_off_after(self, filename):
-        #"""
-        #Display all stacktrace lines after this filename.
-
-        #Will not show any part of the stacktrace in this filename above it.
-        #"""
-        #if not Path(filename).exists():
-            #raise exceptions.StackTraceFilenameNotFound(filename)
-        #new_template = copy(self)
-        #new_template._cut_top_off_after = Path(filename).abspath()
-        #return new_template
-
-    #def cut_bottom_off_including(self, filename):
-        #if not Path(filename).exists():
-            #raise exceptions.StackTraceFilenameNotFound(filename)
-        #new_template = copy(self)
-        #new_template._cut_bottom_off_including = Path(filename).abspath()
-        #return new_template
-
-    #def cut_bottom_off_until(self, filename):
-        #if not Path(filename).exists():
-            #raise exceptions.StackTraceFilenameNotFound(filename)
-        #new_template = copy(self)
-        #new_template._cut_bottom_off_until = Path(filename).abspath()
-        #return new_template
-    
-    
     def from_stacktrace_data(self, data):
+        """
+        Display a nicely formatted string representing a prettified
+        form of the stacktrace data supplied in the data dict.
+        """
         ## Cut out lower level tracebacks that we were instructed to ignore
         tracebacks = [PrettyTraceback(traceback) for traceback in data['tracebacks']]
         
@@ -100,48 +74,8 @@ class PrettyStackTemplate(object):
         )
 
     def current_stacktrace(self):
+        """
+        Return a nicely formatted string representing a prettified form
+        of the current stacktrace.
+        """
         return self.from_stacktrace_data(utils.current_stack_trace_data())
-        #tb_id = 0
-        #self.exception = sys.exc_info()[1]
-        #tb = sys.exc_info()[2]
-        ## Create list of tracebacks
-        #tracebacks = []
-        #while tb is not None:
-            #filename = tb.tb_frame.f_code.co_filename
-            #if filename == '<frozen importlib._bootstrap>':
-                #break
-
-            #tracebacks.append(PrettyTraceback(tb_id, tb))
-            #tb_id = tb_id + 1
-            #tb = tb.tb_next
-
-        ### Cut out lower level tracebacks that we were instructed to ignore
-        #if self._cut_calling_code is not None:
-            #updated_tracebacks = []
-            #start_including = False
-            #for traceback in tracebacks:
-                #if start_including and traceback.abspath != self._cut_calling_code:
-                    #updated_tracebacks.append(traceback)
-
-                #if traceback.abspath == self._cut_calling_code:
-                    #start_including = True
-            #tracebacks = updated_tracebacks
-
-        ## Render list of tracebacks to template
-        #env = Environment()
-        #env.loader = FileSystemLoader(str(self._template.dirname()))
-        #tmpl = env.get_template(str(self._template.basename()))
-        #return tmpl.render(
-            #stacktrace={
-                #'tracebacks': [traceback.to_dict() for traceback in tracebacks],
-                #'exception': str(self.exception),
-                #'exception_type': "{}.{}".format(
-                    #type(self.exception).__module__, type(self.exception).__name__
-                #),
-                #'docstring': str(self.exception.__doc__)
-                #if self.exception.__doc__ is not None else None
-            #},
-            #Fore=colorama.Fore,
-            #Back=colorama.Back,
-            #Style=colorama.Style,
-        #)
