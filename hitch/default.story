@@ -26,8 +26,10 @@ Default:
   scenario:
   - Run code
   - Output will be:
-      reference: example exception
+      reference: (( exception reference ))
       changeable:
       - <ipython-input-((( anything )))>
       - /((( anything )))/example1.py
       - /((( anything )))/examplepythoncode.py
+  params:
+    exception reference: example exception

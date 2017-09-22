@@ -29,6 +29,7 @@ class Engine(BaseEngine):
         }),
         params=Map({
             Optional("python version"): Str(),
+            Optional("exception reference"): Str(),
         }),
         about={
             Optional("description"): Str(),

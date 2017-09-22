@@ -17,6 +17,7 @@ class PrettyStackTemplate(object):
     def __init__(self):
         self._template = TEMPLATE_FOLDER.joinpath("console.jinja2")
         self._cut_calling_code = None
+        self._only_the_exception = False
 
     def to_console(self):
         """
@@ -36,6 +37,14 @@ class PrettyStackTemplate(object):
             raise exceptions.StackTraceFilenameNotFound(filename)
         new_template = copy(self)
         new_template._cut_calling_code = Path(filename).abspath()
+        return new_template
+
+    def only_the_exception(self):
+        """
+        Do not show the stack trace, only show the exception details.
+        """
+        new_template = copy(self)
+        new_template._only_the_exception = True
         return new_template
 
     def from_stacktrace_data(self, data):
@@ -71,6 +80,7 @@ class PrettyStackTemplate(object):
             Fore=colorama.Fore,
             Back=colorama.Back,
             Style=colorama.Style,
+            only_the_exception=self._only_the_exception,
         )
 
     def current_stacktrace(self):
