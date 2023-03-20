@@ -1,6 +1,6 @@
 Default:
   based on: prettystack
-  preconditions:
+  given:
     example1.py: |
       class CatchThis(Exception):
           """
@@ -23,7 +23,7 @@ Default:
           exception_raiser()
       except Exception as exception:
           print(prettystack_template.current_stacktrace())
-  scenario:
+  steps:
   - Run code
   - Output will be:
       reference: (( exception reference ))
@@ -31,5 +31,3 @@ Default:
       - <ipython-input-((( anything )))>
       - /((( anything )))/example1.py
       - /((( anything )))/examplepythoncode.py
-  params:
-    exception reference: example exception

@@ -1,10 +1,8 @@
 Stop on file:
-  based on: prettystack
-  description: |
+  about: |
     You can intentionally ignore lines in the traceback which
     occur up or down the stack.
-
-  preconditions:
+  given:
     example1.py: |
       class CatchThis(Exception):
           """
@@ -40,7 +38,7 @@ Stop on file:
           yet_yet_another_exception_raiser()
       except Exception as exception:
           print(prettystack_template1.current_stacktrace())
-  scenario:
+  steps:
   - Run code
   - Output will be:
       reference: cut calling code

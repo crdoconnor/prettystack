@@ -1,6 +1,5 @@
 Only the exception:
-  based on: Default
-  preconditions:
+  about:
     code: |
       from prettystack import PrettyStackTemplate
       from example1 import exception_raiser
@@ -11,5 +10,3 @@ Only the exception:
           exception_raiser()
       except Exception as exception:
           print(prettystack_template.current_stacktrace())
-  params:
-    exception reference: only the exception
