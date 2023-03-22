@@ -1,8 +1,11 @@
 #!/bin/bash
 set -e
-PROJECT_NAME=prettystack
-
 PROJECT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" &> /dev/null && pwd)
+PROJECT_NAME=$(cat $PROJECT_DIR/PROJECT_NAME | tr -d '\n')
+if [ -z "$PROJECT_NAME" ]; then
+    echo "PROJECT_NAME file must be set with project name."
+    exit 1
+fi
 FOLDER_HASH=$(echo $PROJECT_DIR | md5sum | cut -c 1-5)
 GEN_VOLUME_NAME=hitch-vol-${PROJECT_NAME}-${FOLDER_HASH}
 IMAGE_NAME=hitch-${FOLDER_HASH}-${PROJECT_NAME}
@@ -33,7 +36,10 @@ case "$1" in
                 fi
                 ;;
             "gen")
-                hitchrun "rm -rf /gen/*"
+                if podman volume exists $GEN_VOLUME_NAME; then
+                    podman volume rm -f $GEN_VOLUME_NAME
+                fi
+                podman volume create $GEN_VOLUME_NAME
                 ;;
             "pyenv")
                 hitchrun "rm -rf /gen/pyenv/"
@@ -68,7 +74,7 @@ case "$1" in
                 ;;
             "pylibrarytoolkit")
                 hitchrun "/gen/venv/bin/pip uninstall hitchpylibrarytoolkit -y"
-                hitchrun "/gen/venv/bin/pip install --upgrade-strategy only-if-needed -e /src/hitchpylibrarytoolkit"
+                hitchrun "/gen/venv/bin/pip install --no-deps -e /src/hitchpylibrarytoolkit"
                 ;;
             *)
                 echo "Invalid make target. ./key.sh make [all|gen|pylibrarytoolkit]"
