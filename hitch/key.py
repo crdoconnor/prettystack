@@ -1,16 +1,8 @@
 from commandlib import run
-import hitchpython
 from hitchstory import StoryCollection, StorySchema, BaseEngine, exceptions
-from hitchrun import expected
-from commandlib import Command
+from commandlib import Command, python
 from strictyaml import MapPattern, Str, Map, Int, Optional, load
-from pathquery import pathq
-import hitchtest
-import hitchdoc
-from hitchrun import hitch_maintenance
-from commandlib import python
-from hitchrun import DIR
-from hitchrun.decorators import ignore_ctrlc
+from pathquery import pathquery
 from hitchrunpy import ExamplePythonCode, ExpectedExceptionMessageWasDifferent
 import requests
 
