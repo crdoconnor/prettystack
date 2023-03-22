@@ -1,5 +1,6 @@
 Only the exception:
   about:
+  given:
     code: |
       from prettystack import PrettyStackTemplate
       from example1 import exception_raiser

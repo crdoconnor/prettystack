@@ -21,9 +21,9 @@ classifiers = [
     "Natural Language :: English",
 ]
 dependencies = [
-    "colorama",
-    "jinja2",
-    "path.py",
+    "colorama>=0.4.0",
+    "jinja2>=2.10",
+    "path.py>=9.1",
 ]
 dynamic = ["version", "readme"]
 

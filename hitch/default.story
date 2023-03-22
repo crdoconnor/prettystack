@@ -1,5 +1,4 @@
 Default:
-  based on: prettystack
   given:
     example1.py: |
       class CatchThis(Exception):
@@ -26,7 +25,7 @@ Default:
   steps:
   - Run code
   - Output will be:
-      reference: (( exception reference ))
+      reference: example-exception.txt
       changeable:
       - <ipython-input-((( anything )))>
       - /((( anything )))/example1.py
