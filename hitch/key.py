@@ -6,10 +6,10 @@ from engine import Engine
 
 
 toolkit = hitchpylibrarytoolkit.ProjectToolkitV2(
-    "HitchStory",
-    "hitchstory",
-    "hitchdev/hitchstory",
-    image="![](sliced-cucumber.jpg)",
+    "PrettyStack",
+    "prettystack",
+    "crdoconnor/prettystack",
+    image="",
 )
 
 
@@ -152,7 +152,7 @@ def envirotest(strategy_name):
 
     test_package = pyenv.PythonRequirements(
         [
-            "hitchstory=={}".format(_current_version()),
+            "prettystack=={}".format(_current_version()),
         ],
         test_repo=True,
     )
