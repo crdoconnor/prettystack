@@ -44,19 +44,37 @@ class Engine(BaseEngine):
         if self.path.state.exists():
             self.path.state.rmtree(ignore_errors=True)
         self.path.state.mkdir()
+        
+        self._included_files = []
 
         for filename, contents in list(self.given.get("files", {}).items()):
             self.path.state.joinpath(filename).write_text(self.given["files"][filename])
             self._included_files.append(self.path.state.joinpath(filename))
 
         self.python = Command(self._python_path)
+        
+        self.example_py_code = (
+            ExamplePythonCode(self.python, self.path.state)
+            .with_setup_code(self.given.get("setup", ""))
+            .with_terminal_size(160, 100)
+            .include_files(*self._included_files)
+        )
     
     def run_code(self):
-        pass
+        to_run = self.example_py_code.with_code(self.given["code"])
+        
+        result = to_run.run()
+        self._actual_output = result.output
     
-    @validate(reference=Str(), changeable=Seq(Str()))
-    def output_will_be(self, reference, changeable):
-        pass
+    def output_will_be(self, will_output):
+        try:
+            Templex(will_output).assert_match(self._actual_output)
+        except AssertionError:
+            if self._rewrite:
+                self.current_step.update(**{"will_output": self._actual_output})
+            else:
+                raise
+
 
     def pause(self, message="Pause"):
         import IPython
@@ -66,3 +84,7 @@ class Engine(BaseEngine):
     def tear_down(self):
         if self.path.q.exists():
             print(self.path.q.text())
+
+    def on_success(self):
+        if self._rewrite:
+            self.new_story.save()

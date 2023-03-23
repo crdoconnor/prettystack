@@ -3,31 +3,32 @@ Stop on file:
     You can intentionally ignore lines in the traceback which
     occur up or down the stack.
   given:
-    example1.py: |
-      class CatchThis(Exception):
-          """
-          Some kind of docstring
-          """
-          pass
+    files:
+      example1.py: |
+        class CatchThis(Exception):
+            """
+            Some kind of docstring
+            """
+            pass
 
-      def exception_raiser():
-          raise CatchThis("Some kind of message")
+        def exception_raiser():
+            raise CatchThis("Some kind of message")
 
-      def something_else():
-          pass
-    example2.py: |
-      from example1 import exception_raiser
+        def something_else():
+            pass
+      example2.py: |
+        from example1 import exception_raiser
 
-      def another_exception_raiser():
-          exception_raiser()
-    example3.py: |
-      from example2 import another_exception_raiser
+        def another_exception_raiser():
+            exception_raiser()
+      example3.py: |
+        from example2 import another_exception_raiser
 
-      def yet_another_exception_raiser():
-          another_exception_raiser()
+        def yet_another_exception_raiser():
+            another_exception_raiser()
 
-      def yet_yet_another_exception_raiser():
-          yet_another_exception_raiser()
+        def yet_yet_another_exception_raiser():
+            yet_another_exception_raiser()
     code: |
       from prettystack import PrettyStackTemplate
       from example3 import yet_yet_another_exception_raiser
@@ -41,11 +42,35 @@ Stop on file:
   steps:
   - Run code
   - Output will be:
-      reference: cut calling code
-      changeable:
-      - /((( anything )))/example2.py
-      - /((( anything )))/example1.py
-      - /((( anything )))/examplepythoncode.py
+      will output: |-
+        [3]: function 'another_exception_raiser'                                                                                                                        
+          /gen/state/working/example2.py                                                                                                                                
+                                                                                                                                                                        
+                                                                                                                                                                        
+                1 :                                                                                                                                                     
+                2 : def another_exception_raiser():                                                                                                                     
+            --> 3 :     exception_raiser()                                                                                                                              
+                4 :                                                                                                                                                     
+                                                                                                                                                                        
+                                                                                                                                                                        
+                                                                                                                                                                        
+        [4]: function 'exception_raiser'                                                                                                                                
+          /gen/state/working/example1.py                                                                                                                                
+                                                                                                                                                                        
+                                                                                                                                                                        
+                5 :                                                                                                                                                     
+                6 : def exception_raiser():                                                                                                                             
+            --> 7 :     raise CatchThis("Some kind of message")                                                                                                         
+                8 :                                                                                                                                                     
+                                                                                                                                                                        
+                                                                                                                                                                        
+                                                                                                                                                                        
+        example1.CatchThis                                                                                                                                              
+                                                                                                                                                                        
+            Some kind of docstring                                                                                                                                      
+                                                                                                                                                                        
+        Some kind of message
+
 
     #- Run command: |
         #from prettystack import PrettyStackTemplate
