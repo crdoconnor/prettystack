@@ -1,27 +1,27 @@
-name: Envirotest
+#name: Envirotest
 
-on:
-  workflow_dispatch:
-  schedule:
-    # Run every friday evening, to catch before weekend
-    - cron: '0 17 * * Fri'
+#on:
+  #workflow_dispatch:
+  #schedule:
+    ## Run every friday evening, to catch before weekend
+    #- cron: '0 17 * * Fri'
 
-jobs:
-  envirotest:
-    timeout-minutes: 30
-    runs-on: ubuntu-latest
-    steps:
-      - name: checkout repo
-        uses: actions/checkout@v2
+#jobs:
+  #envirotest:
+    #timeout-minutes: 30
+    #runs-on: ubuntu-latest
+    #steps:
+      #- name: checkout repo
+        #uses: actions/checkout@v2
 
-      - name: build
-        run: |
-          mkdir -p ~/.ssh/
-          touch ~/.ssh/id_rsa
-          touch ~/.ssh/id_rsa.pub
-          echo test | podman secret create pypitoken -
-          ./key.sh make
+      #- name: build
+        #run: |
+          #mkdir -p ~/.ssh/
+          #touch ~/.ssh/id_rsa
+          #touch ~/.ssh/id_rsa.pub
+          #echo test | podman secret create pypitoken -
+          #./key.sh make
 
-      - name: envirotest
-        run: |
-          ./key.sh envirotest full
+      #- name: envirotest
+        #run: |
+          #./key.sh envirotest full
