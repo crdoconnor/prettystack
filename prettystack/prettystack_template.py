@@ -7,7 +7,7 @@ from copy import copy
 import colorama
 
 
-TEMPLATE_FOLDER = Path(__file__).abspath().dirname()
+TEMPLATE_FOLDER = Path(__file__).absolute().dirname()
 
 
 class PrettyStackTemplate(object):
@@ -36,7 +36,7 @@ class PrettyStackTemplate(object):
         if not Path(filename).exists():
             raise exceptions.StackTraceFilenameNotFound(filename)
         new_template = copy(self)
-        new_template._cut_calling_code = Path(filename).abspath()
+        new_template._cut_calling_code = Path(filename).absolute()
         return new_template
 
     def only_the_exception(self):

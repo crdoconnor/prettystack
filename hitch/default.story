@@ -51,6 +51,6 @@ Default:
                                                                                                                                                                         
         example1.CatchThis                                                                                                                                              
                                                                                                                                                                         
-            Some kind of docstring                                                                                                                                      
+        Some kind of docstring                                                                                                                                          
                                                                                                                                                                         
         Some kind of message

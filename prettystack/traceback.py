@@ -77,7 +77,7 @@ class PrettyTraceback(object):
 
     @property
     def abspath(self):
-        return Path(self.filename).abspath()
+        return Path(self.filename).absolute()
 
     #@property
     #def lineno(self):
